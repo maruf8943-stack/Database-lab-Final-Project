@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}অর্ডার পরিচালনা - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <h2>📦 অর্ডার পরিচালনা</h2>
+
+    {% if orders %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>অর্ডার আইডি</th>
+                <th>গ্রাহক</th>
+                <th>মোট পরিমাণ</th>
+                <th>স্ট্যাটাস</th>
+                <th>তারিখ</th>
+                <th>পদক্ষেপ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.username }}</td>
+                <td>৳ {{ "%.2f"|format(order.total_amount) }}</td>
+                <td>
+                    <span class="status {{ order.status }}">{{ order.status }}</span>
+                </td>
+                <td>{{ order.created_at[:10] }}</td>
+                <td>
+                    <a href="{{ url_for('order_details', order_id=order.id) }}" class="btn btn-info btn-sm">👁️ বিস্তারিত</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>কোনো অর্ডার পাওয়া যায়নি</p>
+    {% endif %}
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← ড্যাশবোর্ডে ফিরুন</a>
+</div>
+{% endblock %}

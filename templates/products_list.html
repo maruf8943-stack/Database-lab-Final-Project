@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}পণ্য পরিচালনা - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <h2>📦 পণ্য পরিচালনা</h2>
+
+    <a href="{{ url_for('add_product') }}" class="btn btn-primary">➕ নতুন পণ্য যোগ করুন</a>
+
+    {% if products %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>আইডি</th>
+                <th>পণ্যের নাম</th>
+                <th>মূল্য</th>
+                <th>স্টক</th>
+                <th>পদক্ষেপ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>#{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>৳ {{ "%.2f"|format(product.price) }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>
+                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-warning btn-sm">✏️ সম্পাদনা</a>
+                    <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('নিশ্চিত?')">🗑️ মুছুন</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>কোনো পণ্য পাওয়া যায়নি</p>
+    {% endif %}
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← ড্যাশবোর্ডে ফিরুন</a>
+</div>
+{% endblock %}

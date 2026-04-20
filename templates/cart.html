@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}শপিং কার্ট - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h2>🛒 আপনার শপিং কার্ট</h2>
+
+    {% if items %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>পণ্য</th>
+                <th>মূল্য</th>
+                <th>পরিমাণ</th>
+                <th>সাবটোটাল</th>
+                <th>পদক্ষেপ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>৳ {{ "%.2f"|format(item.product.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>৳ {{ "%.2f"|format(item.subtotal) }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('সরিয়ে ফেলতে নিশ্চিত?')">❌ সরান</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="cart-summary">
+        <div class="summary-box">
+            <h3>অর্ডার সারসংক্ষেপ</h3>
+            <div class="summary-row">
+                <span>মোট পরিমাণ:</span>
+                <strong>�� {{ "%.2f"|format(total) }}</strong>
+            </div>
+            <a href="{{ url_for('checkout') }}" class="btn btn-success btn-block">✅ চেকআউট করুন</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">← কেনাকাটা চালিয়ে যান</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <p>আপনার কার্ট খালি</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">← কেনাকাটা শুরু করুন</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

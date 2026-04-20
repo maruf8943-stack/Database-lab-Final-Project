@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}গ্রাহক তালিকা - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <h2>👥 গ্রাহক তালিকা</h2>
+
+    {% if customers %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>আইডি</th>
+                <th>ব্যবহারকারী নাম</th>
+                <th>ইমেইল</th>
+                <th>যোগদান তারিখ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>#{{ customer.id }}</td>
+                <td>{{ customer.username }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.created_at[:10] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>কোনো গ্রাহক পাওয়া যায়নি</p>
+    {% endif %}
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← ড্যাশবোর্ডে ফিরুন</a>
+</div>
+{% endblock %}

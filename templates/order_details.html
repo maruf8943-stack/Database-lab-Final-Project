@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}অর্ডার বিস্তারিত - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <h2>📋 অ��্ডার #{{ order.id }} বিস্তারিত</h2>
+
+    <div class="order-details-box">
+        <h3>গ্রাহক তথ্য</h3>
+        <p><strong>নাম:</strong> {{ order.username }}</p>
+        <p><strong>ইমেইল:</strong> {{ order.email }}</p>
+        <p><strong>অর্ডার তারিখ:</strong> {{ order.created_at }}</p>
+        <p><strong>স্ট্যাটাস:</strong> <span class="status {{ order.status }}">{{ order.status }}</span></p>
+    </div>
+
+    <div class="order-items">
+        <h3>অর্ডার আইটেম</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>পণ্য</th>
+                    <th>মূল্য</th>
+                    <th>পরিমাণ</th>
+                    <th>সাবটোটাল</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>৳ {{ "%.2f"|format(item.price) }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>৳ {{ "%.2f"|format(item.price * item.quantity) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="order-summary">
+        <h3>মোট পরিমাণ</h3>
+        <p class="total-amount">৳ {{ "%.2f"|format(order.total_amount) }}</p>
+    </div>
+
+    <div class="order-actions">
+        <h3>স্ট্যাটাস আপডেট করুন</h3>
+        <div class="status-buttons">
+            <button class="btn btn-warning" onclick="updateStatus('pending')">⏳ পেন্ডিং</button>
+            <button class="btn btn-info" onclick="updateStatus('processing')">⚙️ প্রসেসিং</button>
+            <button class="btn btn-success" onclick="updateStatus('completed')">✅ সম্পন্ন</button>
+            <button class="btn btn-danger" onclick="updateStatus('cancelled')">❌ বাতিল</button>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">← অর্ডার তালিকায় ফিরুন</a>
+</div>
+
+<script>
+function updateStatus(status) {
+    fetch('{{ url_for("update_order_status", order_id=order.id, status="") }}' + status, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            alert('✅ স্ট্যাটাস আপডেট হয়েছে');
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

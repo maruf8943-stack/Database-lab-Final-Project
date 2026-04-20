@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}এডমিন ড্যাশবোর্ড - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>📊 এডমিন ড্যাশবোর্ড</h1>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <div class="card-icon">👥</div>
+            <div class="card-content">
+                <h3>মোট গ্রাহক</h3>
+                <p class="card-value">{{ customers }}</p>
+                <a href="{{ url_for('admin_customers') }}" class="card-link">বিস্তারিত দেখুন →</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">📦</div>
+            <div class="card-content">
+                <h3>মোট পণ্য</h3>
+                <p class="card-value">{{ products }}</p>
+                <a href="{{ url_for('admin_products') }}" class="card-link">পণ্য পরিচালনা করুন →</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">🛍️</div>
+            <div class="card-content">
+                <h3>মোট অর্ডার</h3>
+                <p class="card-value">{{ orders }}</p>
+                <a href="{{ url_for('admin_orders') }}" class="card-link">অর্ডার দেখুন →</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">💰</div>
+            <div class="card-content">
+                <h3>মোট রাজস্ব</h3>
+                <p class="card-value">৳ {{ "%.2f"|format(revenue) }}</p>
+                <a href="{{ url_for('admin_revenue') }}" class="card-link">বিস্তারিত দেখুন →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-menu">
+        <h2>⚙️ দ্রুত লিঙ্ক</h2>
+        <div class="menu-grid">
+            <a href="{{ url_for('add_product') }}" class="menu-item">➕ নতুন পণ্য যোগ করুন</a>
+            <a href="{{ url_for('admin_products') }}" class="menu-item">📋 সব পণ্য দেখুন</a>
+            <a href="{{ url_for('admin_customers') }}" class="menu-item">👥 গ্রাহক তালিকা</a>
+            <a href="{{ url_for('admin_orders') }}" class="menu-item">📦 অর্ডার পরিচালনা</a>
+            <a href="{{ url_for('admin_revenue') }}" class="menu-item">📈 রাজস্ব বিশ্লেষণ</a>
+            <a href="{{ url_for('logout') }}" class="menu-item logout">🚪 লগআউট</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

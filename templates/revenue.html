@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}রাজস্ব বিশ্লেষণ - ই-কমার্স স্টোর{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <h2>💰 রাজস্ব বিশ্লেষণ</h2>
+
+    <div class="revenue-summary">
+        <div class="summary-card">
+            <h3>মোট রাজস্ব</h3>
+            <p class="big-number">৳ {{ "%.2f"|format(total) }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>মোট অর্ডার</h3>
+            <p class="big-number">{{ orders }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>গড় অর্ডার মূল্য</h3>
+            <p class="big-number">৳ {% if orders > 0 %}{{ "%.2f"|format(total / orders) }}{% else %}0.00{% endif %}</p>
+        </div>
+    </div>
+
+    <h3>📊 বিস্তারিত রাজস্ব রেকর্ড</h3>
+
+    {% if revenue_data %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>অর্ডার আইডি</th>
+                <th>পরিমাণ</th>
+                <th>তারিখ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for revenue in revenue_data %}
+            <tr>
+                <td><a href="{{ url_for('order_details', order_id=revenue.order_id) }}">#{{ revenue.order_id }}</a></td>
+                <td>৳ {{ "%.2f"|format(revenue.amount) }}</td>
+                <td>{{ revenue.date[:10] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>কোনো রাজস্ব রেকর্ড পাওয়া যায়নি</p>
+    {% endif %}
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← ড্যাশবোর্ডে ফিরুন</a>
+</div>
+{% endblock %}
