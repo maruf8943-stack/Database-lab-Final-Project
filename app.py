@@ -8,13 +8,12 @@ from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'ecommerce-secret-key-2026')
+app.secret_key = os.environ.get('SECRET_KEY', 'mysecretkey2026')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# ✅ FIX: Read DB config from environment variables (Railway injects these)
 DB_CONFIG = {
     'host': os.environ.get('MYSQLHOST', 'shinkansen.proxy.rlwy.net'),
     'port': int(os.environ.get('MYSQLPORT', 29655)),
@@ -26,11 +25,9 @@ DB_CONFIG = {
     'connect_timeout': 10,
     'read_timeout': 30,
     'write_timeout': 30,
-
 }
 
 def get_db():
-    """Get database connection"""
     try:
         conn = pymysql.connect(**DB_CONFIG)
         return conn
@@ -39,17 +36,12 @@ def get_db():
         return None
 
 def query(sql, params=None, fetch_one=False, fetch_all=False):
-    """Execute query"""
     conn = get_db()
     if not conn:
         return None
     try:
         with conn.cursor() as cursor:
-            if params:
-                cursor.execute(sql, params)
-            else:
-                cursor.execute(sql)
-
+            cursor.execute(sql, params) if params else cursor.execute(sql)
             if fetch_one:
                 return cursor.fetchone()
             elif fetch_all:
@@ -66,7 +58,6 @@ def query(sql, params=None, fetch_one=False, fetch_all=False):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Decorators
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -80,13 +71,11 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             return redirect(url_for('login'))
-        user = query('SELECT is_admin FROM users WHERE id = %s', (session['user_id'],), fetch_one=True)
-        if not user or not user['is_admin']:
+        if not session.get('is_admin'):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
 
-# ==================== MAIN ROUTES ====================
 
 @app.route('/')
 def index():
@@ -102,13 +91,13 @@ def register():
         error = None
 
         if not username:
-            error = 'ব্যবহারকারী নাম প্রয়োজন'
+            error = 'Username is required'
         elif not email:
-            error = 'ইমেইল প্রয়োজন'
+            error = 'Email is required'
         elif not password:
-            error = 'পাসওয়ার্ড প্রয়োজন'
+            error = 'Password is required'
         elif len(password) < 6:
-            error = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে'
+            error = 'Password must be at least 6 characters'
 
         if error is None:
             hashed = generate_password_hash(password)
@@ -117,7 +106,7 @@ def register():
                       (username, email, hashed))
                 return redirect(url_for('login'))
             except:
-                error = 'ব্যবহারকারী নাম বা ইমেইল ইতিমধ্যে বিদ্যমান'
+                error = 'Username or email already exists'
 
         return render_template('register.html', error=error)
     return render_template('register.html')
@@ -131,15 +120,15 @@ def login():
         error = None
 
         if user is None:
-            error = 'ভুল ব্যবহারকারী নাম'
+            error = 'Invalid username'
         elif not check_password_hash(user['password'], password):
-            error = 'ভুল পাসওয়ার্ড'
+            error = 'Incorrect password'
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
             session['username'] = user['username']
-            session['is_admin'] = user['is_admin']
+            session['is_admin'] = bool(user['is_admin'])
             if user['is_admin']:
                 return redirect(url_for('admin_dashboard'))
             return redirect(url_for('index'))
@@ -152,7 +141,7 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# ==================== SHOPPING ROUTES ====================
+
 
 @app.route('/cart')
 @login_required
@@ -212,11 +201,11 @@ def checkout():
 def process_payment():
     cart_items = session.get('cart', {})
     if not cart_items:
-        return jsonify({'success': False, 'message': 'কার্ট খালি'})
+        return jsonify({'success': False, 'message': 'Cart is empty'})
 
     conn = get_db()
     if not conn:
-        return jsonify({'success': False, 'message': 'ডাটাবেস ত্রুটি'})
+        return jsonify({'success': False, 'message': 'Database connection error'})
 
     try:
         with conn.cursor() as cursor:
@@ -228,7 +217,7 @@ def process_payment():
                 product = cursor.fetchone()
                 if product:
                     if product['quantity'] < quantity:
-                        return jsonify({'success': False, 'message': 'স্টক অপর্যাপ্ত'})
+                        return jsonify({'success': False, 'message': 'Insufficient stock'})
                     subtotal = float(product['price']) * quantity
                     total += subtotal
                     order_details.append({
@@ -252,36 +241,42 @@ def process_payment():
 
             session['cart'] = {}
             session.modified = True
-            return jsonify({'success': True, 'message': 'পেমেন্ট সফল!', 'order_id': order_id})
+            return jsonify({'success': True, 'message': 'Payment successful!', 'order_id': order_id})
 
     except Exception as e:
         print(f"Payment error: {e}")
-        return jsonify({'success': False, 'message': f'ত্রুটি: {str(e)}'})
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
     finally:
         conn.close()
 
-# ==================== ADMIN ROUTES ====================
+
 
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
-    all_users = query('SELECT COUNT(*) as count FROM users', fetch_one=True)
-    customers = query('SELECT COUNT(*) as count FROM users WHERE is_admin = 0', fetch_one=True)
-    products = query('SELECT COUNT(*) as count FROM products', fetch_one=True)
-    orders = query('SELECT COUNT(*) as count FROM orders', fetch_one=True)
-    revenue = query('SELECT SUM(amount) as total FROM revenue', fetch_one=True)
-    return render_template('admin.html',
-                           total_users=all_users['count'] if all_users else 0,
-                           customers=customers['count'] if customers else 0,
-                           products=products['count'] if products else 0,
-                           orders=orders['count'] if orders else 0,
-                           revenue=revenue['total'] if revenue and revenue['total'] else 0)
+    try:
+        all_users = query('SELECT COUNT(*) as count FROM users', fetch_one=True)
+        customers = query('SELECT COUNT(*) as count FROM users WHERE is_admin = 0', fetch_one=True)
+        products = query('SELECT COUNT(*) as count FROM products', fetch_one=True)
+        orders = query('SELECT COUNT(*) as count FROM orders', fetch_one=True)
+        revenue = query('SELECT SUM(amount) as total FROM revenue', fetch_one=True)
+        return render_template('admin.html',
+                               total_users=all_users['count'] if all_users else 0,
+                               customers=customers['count'] if customers else 0,
+                               products=products['count'] if products else 0,
+                               orders=orders['count'] if orders else 0,
+                               revenue=revenue['total'] if revenue and revenue['total'] else 0)
+    except Exception as e:
+        return f"<h2>Dashboard Error: {str(e)}</h2>", 500
 
 @app.route('/admin/products')
 @admin_required
 def admin_products():
-    products = query('SELECT * FROM products ORDER BY created_at DESC', fetch_all=True)
-    return render_template('products_list.html', products=products or [])
+    try:
+        products = query('SELECT * FROM products ORDER BY created_at DESC', fetch_all=True)
+        return render_template('products_list.html', products=products or [])
+    except Exception as e:
+        return f"<h2>Products Error: {str(e)}</h2><a href='/admin'>Back</a>", 500
 
 @app.route('/admin/add_product', methods=['GET', 'POST'])
 @admin_required
@@ -294,19 +289,19 @@ def add_product():
         error = None
 
         if not name:
-            error = 'পণ্যের নাম প্রয়োজন'
+            error = 'Product name is required'
         try:
             price = float(price_str) if price_str else 0
             if price <= 0:
-                error = 'মূল্য ০ এর চেয়ে বেশি হতে হবে'
+                error = 'Price must be greater than 0'
         except ValueError:
-            error = 'মূল্য সংখ্যা হতে হবে'
+            error = 'Price must be a number'
         try:
             quantity = int(quantity_str) if quantity_str else 0
             if quantity < 0:
-                error = 'পরিমাণ ঋণাত্মক হতে পারে না'
+                error = 'Quantity cannot be negative'
         except ValueError:
-            error = 'পরিমাণ সংখ্যা হতে হবে'
+            error = 'Quantity must be a number'
 
         if error:
             return render_template('add_product.html', error=error)
@@ -337,19 +332,19 @@ def edit_product(product_id):
         error = None
 
         if not name:
-            error = 'পণ্যের নাম প্রয়োজন'
+            error = 'Product name is required'
         try:
             price = float(price_str) if price_str else 0
             if price <= 0:
-                error = 'মূল্য ০ এর চেয়ে বেশি হতে হবে'
+                error = 'Price must be greater than 0'
         except ValueError:
-            error = 'মূল্য সংখ্যা হতে হবে'
+            error = 'Price must be a number'
         try:
             quantity = int(quantity_str) if quantity_str else 0
             if quantity < 0:
-                error = 'পরিমাণ ঋণাত্মক হতে পারে না'
+                error = 'Quantity cannot be negative'
         except ValueError:
-            error = 'পরিমাণ সংখ্যা হতে হবে'
+            error = 'Quantity must be a number'
 
         if error:
             product = query('SELECT * FROM products WHERE id = %s', (product_id,), fetch_one=True)
@@ -385,64 +380,75 @@ def delete_product(product_id):
 @app.route('/admin/customers')
 @admin_required
 def admin_customers():
-    customers = query('SELECT id, username, email, created_at FROM users WHERE is_admin = 0 ORDER BY created_at DESC', fetch_all=True)
-    return render_template('customers.html', customers=customers or [])
+    try:
+        customers = query('SELECT id, username, email, created_at FROM users WHERE is_admin = 0 ORDER BY created_at DESC', fetch_all=True)
+        return render_template('customers.html', customers=customers or [])
+    except Exception as e:
+        return f"<h2>Customers Error: {str(e)}</h2><a href='/admin'>Back</a>", 500
 
 @app.route('/admin/orders')
 @admin_required
 def admin_orders():
-    orders = query('''SELECT o.id, o.user_id, o.total_amount, o.status, o.created_at, u.username
-                      FROM orders o JOIN users u ON o.user_id = u.id
-                      ORDER BY o.created_at DESC''', fetch_all=True)
-    return render_template('orders.html', orders=orders or [])
+    try:
+        orders = query('''SELECT o.id, o.user_id, o.total_amount, o.status, o.created_at, u.username
+                          FROM orders o JOIN users u ON o.user_id = u.id
+                          ORDER BY o.created_at DESC''', fetch_all=True)
+        return render_template('orders.html', orders=orders or [])
+    except Exception as e:
+        return f"<h2>Orders Error: {str(e)}</h2><a href='/admin'>Back</a>", 500
 
 @app.route('/admin/order_details/<int:order_id>')
 @admin_required
 def order_details(order_id):
-    order = query('''SELECT o.id, o.total_amount, o.status, o.created_at, u.id as user_id, u.username, u.email
-                     FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = %s''',
-                  (order_id,), fetch_one=True)
-    if not order:
-        return redirect(url_for('admin_orders'))
-    items = query('''SELECT oi.id, oi.quantity, oi.price, p.id as product_id, p.name
-                     FROM order_items oi JOIN products p ON oi.product_id = p.id
-                     WHERE oi.order_id = %s''', (order_id,), fetch_all=True)
-    return render_template('order_details.html', order=order, items=items or [])
+    try:
+        order = query('''SELECT o.id, o.total_amount, o.status, o.created_at, u.id as user_id, u.username, u.email
+                         FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = %s''',
+                      (order_id,), fetch_one=True)
+        if not order:
+            return redirect(url_for('admin_orders'))
+        items = query('''SELECT oi.id, oi.quantity, oi.price, p.id as product_id, p.name
+                         FROM order_items oi JOIN products p ON oi.product_id = p.id
+                         WHERE oi.order_id = %s''', (order_id,), fetch_all=True)
+        return render_template('order_details.html', order=order, items=items or [])
+    except Exception as e:
+        return f"<h2>Order Detail Error: {str(e)}</h2><a href='/admin/orders'>Back</a>", 500
 
 @app.route('/admin/update_order_status/<int:order_id>/<status>', methods=['POST'])
 @admin_required
 def update_order_status(order_id, status):
     valid_statuses = ['pending', 'processing', 'completed', 'cancelled']
     if status not in valid_statuses:
-        return jsonify({'success': False, 'message': 'অবৈধ স্ট্যাটাস'})
+        return jsonify({'success': False, 'message': 'Invalid status'})
     query('UPDATE orders SET status = %s WHERE id = %s', (status, order_id))
-    return jsonify({'success': True, 'message': 'স্ট্যাটাস আপডেট হয়েছে'})
+    return jsonify({'success': True, 'message': 'Status updated successfully'})
 
 @app.route('/admin/revenue')
 @admin_required
 def admin_revenue():
-    revenue_data = query('SELECT r.id, r.order_id, r.amount, r.date FROM revenue r ORDER BY r.date DESC', fetch_all=True)
-    total_revenue = query('SELECT SUM(amount) as total FROM revenue', fetch_one=True)
-    total_orders = query('SELECT COUNT(*) as count FROM orders', fetch_one=True)
-    return render_template('revenue.html',
-                           revenue_data=revenue_data or [],
-                           total=total_revenue['total'] if total_revenue and total_revenue['total'] else 0,
-                           orders=total_orders['count'] if total_orders else 0)
+    try:
+        revenue_data = query('SELECT r.id, r.order_id, r.amount, r.date FROM revenue r ORDER BY r.date DESC', fetch_all=True)
+        total_revenue = query('SELECT SUM(amount) as total FROM revenue', fetch_one=True)
+        total_orders = query('SELECT COUNT(*) as count FROM orders', fetch_one=True)
+        return render_template('revenue.html',
+                               revenue_data=revenue_data or [],
+                               total=total_revenue['total'] if total_revenue and total_revenue['total'] else 0,
+                               orders=total_orders['count'] if total_orders else 0)
+    except Exception as e:
+        return f"<h2>Revenue Error: {str(e)}</h2><a href='/admin'>Back</a>", 500
 
-# ==================== ERROR HANDLERS ====================
+
 
 @app.errorhandler(404)
-def page_not_found(error):
-    return render_template('404.html'), 404
+def page_not_found(e):
+    return "<h2 style='text-align:center;margin-top:100px'>404 - Page Not Found</h2><p style='text-align:center'><a href='/'>Go Home</a></p>", 404
 
 @app.errorhandler(500)
-def internal_error(error):
-    return render_template('500.html'), 500
+def internal_error(e):
+    return "<h2 style='text-align:center;margin-top:100px'>500 - Internal Server Error</h2><p style='text-align:center'><a href='/'>Go Home</a></p>", 500
 
-# ==================== APP STARTUP ====================
+
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    # ✅ FIX: Use PORT from environment (Railway requires this), host='0.0.0.0'
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
