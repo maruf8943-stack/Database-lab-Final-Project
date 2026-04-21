@@ -1,30 +1,30 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ই-কমার্স স্টোর{% endblock %}</title>
+    <title>{% block title %}E-Commerce Store{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="{{ url_for('index') }}">🛍️ ই-কমার্স স্টোর</a>
+                <a href="{{ url_for('index') }}">E-Commerce Store</a>
             </div>
             <div class="nav-menu">
                 {% if session.get('user_id') %}
                     {% if session.get('is_admin') %}
-                        <a href="{{ url_for('admin_dashboard') }}" class="nav-link">📊 এডমিন প্যানেল</a>
+                        <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Admin Panel</a>
                     {% else %}
-                        <a href="{{ url_for('index') }}" class="nav-link">🏠 হোম</a>
-                        <a href="{{ url_for('cart') }}" class="nav-link">🛒 কার্ট</a>
+                        <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                        <a href="{{ url_for('cart') }}" class="nav-link">Cart</a>
                     {% endif %}
-                    <a href="{{ url_for('logout') }}" class="nav-link logout">লগআউট</a>
+                    <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
                     <span class="username">{{ session.get('username') }}</span>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="nav-link">লগইন</a>
-                    <a href="{{ url_for('register') }}" class="nav-link register">রেজিস্টার</a>
+                    <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+                    <a href="{{ url_for('register') }}" class="nav-link register">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -43,7 +43,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; ২০২৬ ই-কমার্স স্টোর। সর্বাধিকার সংরক্ষিত।</p>
+            <p>&copy; 2026 E-Commerce Store. All rights reserved.</p>
         </div>
     </footer>
 

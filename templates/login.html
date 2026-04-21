@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}লগইন - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Login - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="auth-form">
-        <h2>🔐 লগইন করুন</h2>
+        <h2>Login</h2>
         
         {% if error %}
         <div class="alert alert-danger">{{ error }}</div>
@@ -13,23 +13,23 @@
 
         <form method="POST">
             <div class="form-group">
-                <label for="username">ব্যবহারকারী নাম:</label>
+                <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required class="form-input">
             </div>
 
             <div class="form-group">
-                <label for="password">পাসওয়ার্ড:</label>
+                <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required class="form-input">
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">লগইন করুন</button>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
 
-        <p class="auth-link">নতুন ব্যবহারকারী? <a href="{{ url_for('register') }}">এখানে রেজিস্টার করুন</a></p>
+        <p class="auth-link">New user? <a href="{{ url_for('register') }}">Register here</a></p>
 
         <div class="demo-credentials">
-            <h4>📌 ডেমো ক্রেডেনশিয়ালস:</h4>
-            <p><strong>এডমিন:</strong> admin / admin123</p>
+            <h4>Demo Credentials:</h4>
+            <p><strong>Admin:</strong> admin / admin123</p>
         </div>
     </div>
 </div>

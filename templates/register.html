@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}রেজিস্টার - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Register - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="auth-form">
-        <h2>📝 নতুন অ্যাকাউন্ট তৈরি করুন</h2>
+        <h2>Create a New Account</h2>
         
         {% if error %}
         <div class="alert alert-danger">{{ error }}</div>
@@ -13,24 +13,24 @@
 
         <form method="POST">
             <div class="form-group">
-                <label for="username">ব্যবহারকারী নাম:</label>
+                <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required class="form-input">
             </div>
 
             <div class="form-group">
-                <label for="email">ইমেইল:</label>
+                <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required class="form-input">
             </div>
 
             <div class="form-group">
-                <label for="password">পাসওয়ার্ড:</label>
+                <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required class="form-input">
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">রেজিস্টার করুন</button>
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
         </form>
 
-        <p class="auth-link">ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="{{ url_for('login') }}">লগইন করুন</a></p>
+        <p class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
     </div>
 </div>
 {% endblock %}

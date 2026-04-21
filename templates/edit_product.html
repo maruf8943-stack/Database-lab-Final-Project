@@ -1,45 +1,45 @@
 {% extends "layout.html" %}
 
-{% block title %}পণ্য সম্পাদনা করুন - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Edit Product - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h2>✏️ পণ্য সম্পাদনা করুন</h2>
+    <h2>Edit Product</h2>
 
     <form method="POST" enctype="multipart/form-data" class="product-form">
         <div class="form-group">
-            <label for="name">পণ্যের নাম:</label>
+            <label for="name">Product Name:</label>
             <input type="text" id="name" name="name" value="{{ product.name }}" required class="form-input">
         </div>
 
         <div class="form-group">
-            <label for="description">বর্ণনা:</label>
+            <label for="description">Description:</label>
             <textarea id="description" name="description" rows="4" class="form-input">{{ product.description }}</textarea>
         </div>
 
         <div class="form-group">
-            <label for="price">মূল্য (টাকায়):</label>
+            <label for="price">Price (in Taka):</label>
             <input type="number" id="price" name="price" step="0.01" value="{{ product.price }}" required class="form-input">
         </div>
 
         <div class="form-group">
-            <label for="quantity">পরিমাণ:</label>
+            <label for="quantity">Quantity:</label>
             <input type="number" id="quantity" name="quantity" min="0" value="{{ product.quantity }}" required class="form-input">
         </div>
 
         <div class="form-group">
-            <label for="image">পণ্যের ছবি:</label>
+            <label for="image">Product Image:</label>
             {% if product.image_filename %}
             <div class="current-image">
                 <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}" alt="{{ product.name }}" style="max-width: 200px; margin-bottom: 10px;">
-                <p>বর্তমান ছবি</p>
+                <p>Current Image</p>
             </div>
             {% endif %}
             <input type="file" id="image" name="image" accept="image/*" class="form-input">
         </div>
 
-        <button type="submit" class="btn btn-success">✅ পরিবর্তন সংরক্ষণ করুন</button>
-        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">← ���িরে যান</a>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">Go Back</a>
     </form>
 </div>
 {% endblock %}

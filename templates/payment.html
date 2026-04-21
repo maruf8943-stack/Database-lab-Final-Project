@@ -1,25 +1,25 @@
 {% extends "layout.html" %}
 
-{% block title %}পেমেন্ট - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Payment - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="payment-container">
     <div class="payment-form">
-        <h2>💳 পেমেন্ট করুন</h2>
+        <h2>Payment</h2>
 
         <div class="alert alert-info">
-            ⚠️ এটি একটি ডেমো অ্যাপ্লিকেশন। কোনো প্রকৃত অর্থ চার্জ করা হবে না।
+            This is a demo application. No real payment will be charged.
         </div>
 
         <form id="paymentForm">
             <div class="form-group">
-                <label>কার্ড নম্বর:</label>
+                <label>Card Number:</label>
                 <input type="text" placeholder="1234 5678 9012 3456" class="form-input" maxlength="19">
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>মেয়াদ শেষের তারিখ:</label>
+                    <label>Expiration Date:</label>
                     <input type="text" placeholder="MM/YY" class="form-input" maxlength="5">
                 </div>
                 <div class="form-group">
@@ -29,14 +29,14 @@
             </div>
 
             <div class="form-group">
-                <label>কার্ডধারীর নাম:</label>
-                <input type="text" placeholder="আপনার নাম" class="form-input">
+                <label>Cardholder Name:</label>
+                <input type="text" placeholder="Your Name" class="form-input">
             </div>
 
-            <button type="submit" class="btn btn-success btn-block">✅ পেমেন্ট সম্পন্ন করুন</button>
+            <button type="submit" class="btn btn-success btn-block">Complete Payment</button>
         </form>
 
-        <a href="{{ url_for('cart') }}" class="btn btn-secondary btn-block">← কার্টে ফিরুন</a>
+        <a href="{{ url_for('cart') }}" class="btn btn-secondary btn-block">Back to Cart</a>
     </div>
 </div>
 
@@ -53,10 +53,10 @@ document.getElementById('paymentForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert('✅ পেমেন্ট সফল! অর্ডার #' + data.order_id);
+            alert('Payment successful. Order #' + data.order_id);
             window.location.href = '{{ url_for("index") }}';
         } else {
-            alert('❌ পেমেন্ট ব্যর্থ: ' + data.message);
+            alert('Payment failed: ' + data.message);
         }
     });
 });

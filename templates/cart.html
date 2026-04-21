@@ -1,20 +1,20 @@
 {% extends "layout.html" %}
 
-{% block title %}শপিং কার্ট - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Shopping Cart - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="cart-container">
-    <h2>🛒 আপনার শপিং কার্ট</h2>
+    <h2>Your Shopping Cart</h2>
 
     {% if items %}
     <table class="cart-table">
         <thead>
             <tr>
-                <th>পণ্য</th>
-                <th>মূল্য</th>
-                <th>পরিমাণ</th>
-                <th>সাবটোটাল</th>
-                <th>পদক্ষেপ</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
                 <td>৳ {{ "%.2f"|format(item.subtotal) }}</td>
                 <td>
                     <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product.id) }}" style="display: inline;">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('সরিয়ে ফেলতে নিশ্চিত?')">❌ সরান</button>
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this item?')">❌ Remove</button>
                     </form>
                 </td>
             </tr>
@@ -36,19 +36,19 @@
 
     <div class="cart-summary">
         <div class="summary-box">
-            <h3>অর্ডার সারসংক্ষেপ</h3>
+            <h3>Order Summary</h3>
             <div class="summary-row">
-                <span>মোট পরিমাণ:</span>
-                <strong>�� {{ "%.2f"|format(total) }}</strong>
+                <span>Total Amount:</span>
+                <strong>৳ {{ "%.2f"|format(total) }}</strong>
             </div>
-            <a href="{{ url_for('checkout') }}" class="btn btn-success btn-block">✅ চেকআউট করুন</a>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">← কেনাকাটা চালিয়ে যান</a>
+            <a href="{{ url_for('checkout') }}" class="btn btn-success btn-block">✅ Proceed to Checkout</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">← Continue Shopping</a>
         </div>
     </div>
     {% else %}
     <div class="empty-cart">
-        <p>আপনার কার্ট খালি</p>
-        <a href="{{ url_for('index') }}" class="btn btn-primary">← কেনাকাটা শুরু করুন</a>
+        <p>Your cart is empty</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">← Start Shopping</a>
     </div>
     {% endif %}
 </div>

@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}হোম - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Home - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="hero">
-    <h1>আমাদের পণ্য কালেকশন</h1>
-    <p>সর্বোত্তম মানের পণ্য সাশ্রয়ী মূল্যে পান</p>
+    <h1>Our Product Collection</h1>
+    <p>Get the best quality products at affordable prices</p>
 </div>
 
 <div class="filters">
-    <input type="text" id="searchInput" placeholder="পণ্য খুঁজুন..." class="search-box">
+    <input type="text" id="searchInput" placeholder="Search products..." class="search-box">
 </div>
 
 <div class="products-grid">
@@ -19,38 +19,38 @@
             {% if product.image_filename %}
                 <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}" alt="{{ product.name }}" class="product-image">
             {% else %}
-                <div class="product-image-placeholder">📦</div>
+                <div class="product-image-placeholder">Product Image</div>
             {% endif %}
             
             <div class="product-info">
                 <h3 class="product-name">{{ product.name }}</h3>
-                <p class="product-description">{{ product.description[:100] if product.description else 'কোন বর্ণনা নেই' }}...</p>
+                <p class="product-description">{{ product.description[:100] if product.description else 'No description available' }}...</p>
                 
                 <div class="product-footer">
                     <span class="product-price">৳ {{ "%.2f"|format(product.price) }}</span>
                     {% if product.quantity > 0 %}
-                        <span class="stock">স্টক: {{ product.quantity }}</span>
+                        <span class="stock">Stock: {{ product.quantity }}</span>
                     {% else %}
-                        <span class="out-of-stock">স্টক নেই</span>
+                        <span class="out-of-stock">Out of Stock</span>
                     {% endif %}
                 </div>
 
                 {% if session.get('user_id') and not session.get('is_admin') and product.quantity > 0 %}
                 <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="add-to-cart-form">
                     <input type="number" name="quantity" min="1" max="{{ product.quantity }}" value="1" class="quantity-input">
-                    <button type="submit" class="btn btn-primary">🛒 কার্টে যোগ করুন</button>
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
                 </form>
                 {% elif not session.get('user_id') %}
-                <a href="{{ url_for('login') }}" class="btn btn-primary btn-block">লগইন করুন</a>
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-block">Login</a>
                 {% else %}
-                <button class="btn btn-disabled" disabled>স্টক শেষ</button>
+                <button class="btn btn-disabled" disabled>Out of Stock</button>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
     {% else %}
     <div class="no-products">
-        <p>কোনো পণ্য পাওয়া যায়নি</p>
+        <p>No products found</p>
     </div>
     {% endif %}
 </div>
