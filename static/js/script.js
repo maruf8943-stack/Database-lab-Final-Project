@@ -9,12 +9,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Format currency in BDT
+
 function formatCurrency(amount) {
     return '৳ ' + parseFloat(amount).toFixed(2);
 }
 
-// Confirm delete actions
+
 function confirmDelete() {
     return confirm('এটি মুছে দেবেন নিশ্চিত?');
 }
@@ -34,7 +34,7 @@ document.addEventListener('submit', function(e) {
     }
 });
 
-// Search functionality
+
 const searchInput = document.getElementById('searchInput');
 if (searchInput) {
     searchInput.addEventListener('input', function() {
@@ -54,7 +54,7 @@ if (searchInput) {
     });
 }
 
-// Payment form handling
+
 const paymentForm = document.getElementById('paymentForm');
 if (paymentForm) {
     paymentForm.addEventListener('submit', function(e) {
@@ -91,7 +91,7 @@ if (paymentForm) {
     });
 }
 
-// Notification function
+
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type}`;
@@ -109,7 +109,7 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-// Smooth scroll
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
