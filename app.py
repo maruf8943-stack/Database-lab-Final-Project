@@ -16,13 +16,17 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # ✅ FIX: Read DB config from environment variables (Railway injects these)
 DB_CONFIG = {
-    'host': os.environ.get('MYSQLHOST', 'localhost'),
-    'port': int(os.environ.get('MYSQLPORT', 3306)),
+    'host': os.environ.get('MYSQLHOST', 'shinkansen.proxy.rlwy.net'),
+    'port': int(os.environ.get('MYSQLPORT', 29655)),
     'user': os.environ.get('MYSQLUSER', 'root'),
-    'password': os.environ.get('MYSQLPASSWORD', ''),
-    'database': os.environ.get('MYSQLDATABASE', 'ecommerce_db'),
+    'password': os.environ.get('MYSQLPASSWORD', 'gIkrfNobviTrJZkTqqIOBEinnlzsrbJb'),
+    'database': os.environ.get('MYSQLDATABASE', 'railway'),
     'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor
+    'cursorclass': pymysql.cursors.DictCursor,
+    'connect_timeout': 10,
+    'read_timeout': 30,
+    'write_timeout': 30,
+
 }
 
 def get_db():
