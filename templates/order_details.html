@@ -1,28 +1,28 @@
 {% extends "layout.html" %}
 
-{% block title %}অর্ডার বিস্তারিত - ই-কমার্স স্টোর{% endblock %}
+{% block title %}Order Details - E-Commerce Store{% endblock %}
 
 {% block content %}
 <div class="admin-section">
-    <h2>📋 অ��্ডার #{{ order.id }} বিস্তারিত</h2>
+    <h2>📋 Order #{{ order.id }} Details</h2>
 
     <div class="order-details-box">
-        <h3>গ্রাহক তথ্য</h3>
-        <p><strong>নাম:</strong> {{ order.username }}</p>
-        <p><strong>ইমেইল:</strong> {{ order.email }}</p>
-        <p><strong>অর্ডার তারিখ:</strong> {{ order.created_at }}</p>
-        <p><strong>স্ট্যাটাস:</strong> <span class="status {{ order.status }}">{{ order.status }}</span></p>
+        <h3>Customer Information</h3>
+        <p><strong>Name:</strong> {{ order.username }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at | string | truncate(19, True, '') }}</p>
+        <p><strong>Status:</strong> <span class="status {{ order.status }}">{{ order.status }}</span></p>
     </div>
 
     <div class="order-items">
-        <h3>অর্ডার আইটেম</h3>
+        <h3>Order Items</h3>
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>পণ্য</th>
-                    <th>মূল্য</th>
-                    <th>পরিমাণ</th>
-                    <th>সাবটোটাল</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,21 +39,21 @@
     </div>
 
     <div class="order-summary">
-        <h3>মোট পরিমাণ</h3>
+        <h3>Total Amount</h3>
         <p class="total-amount">৳ {{ "%.2f"|format(order.total_amount) }}</p>
     </div>
 
     <div class="order-actions">
-        <h3>স্ট্যাটাস আপডেট করুন</h3>
+        <h3>Update Status</h3>
         <div class="status-buttons">
-            <button class="btn btn-warning" onclick="updateStatus('pending')">⏳ পেন্ডিং</button>
-            <button class="btn btn-info" onclick="updateStatus('processing')">⚙️ প্রসেসিং</button>
-            <button class="btn btn-success" onclick="updateStatus('completed')">✅ সম্পন্ন</button>
-            <button class="btn btn-danger" onclick="updateStatus('cancelled')">❌ বাতিল</button>
+            <button class="btn btn-warning" onclick="updateStatus('pending')">⏳ Pending</button>
+            <button class="btn btn-info" onclick="updateStatus('processing')">⚙️ Processing</button>
+            <button class="btn btn-success" onclick="updateStatus('completed')">✅ Completed</button>
+            <button class="btn btn-danger" onclick="updateStatus('cancelled')">❌ Cancelled</button>
         </div>
     </div>
 
-    <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">← অর্ডার তালিকায় ফিরুন</a>
+    <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">← Back to Orders</a>
 </div>
 
 <script>
@@ -64,7 +64,7 @@ function updateStatus(status) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert('✅ স্ট্যাটাস আপডেট হয়েছে');
+            alert('✅ Status updated successfully!');
             location.reload();
         }
     });
